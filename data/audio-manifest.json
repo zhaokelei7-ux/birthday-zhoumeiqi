@@ -11,6 +11,18 @@
     "file": "audio/p04.mp3",
     "duration": 8.3
   },
+  "金联盟": {
+    "file": "audio/p05.mp3",
+    "duration": 8.85
+  },
+  "姚蓬杰": {
+    "file": "audio/p06.mp3",
+    "duration": 7.68
+  },
+  "张慧峰": {
+    "file": "audio/p07.mp3",
+    "duration": 13.65
+  },
   "冯伟": {
     "file": "audio/p08.mp3",
     "duration": 7.45
@@ -55,9 +67,21 @@
     "file": "audio/p18.mp3",
     "duration": 9.31
   },
+  "黄崇珂": {
+    "file": "audio/p19.mp3",
+    "duration": 5.54
+  },
+  "张珊妮": {
+    "file": "audio/p20.mp3",
+    "duration": 19.3
+  },
   "赵慢慢": {
     "file": "audio/p21.mp3",
     "duration": 15.95
+  },
+  "郑会": {
+    "file": "audio/p22.mp3",
+    "duration": 8.11
   },
   "彭文": {
     "file": "audio/p23.mp3",
