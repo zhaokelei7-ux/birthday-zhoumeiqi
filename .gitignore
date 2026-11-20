@@ -1,0 +1,13 @@
+audio-src/
+dist/
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+Thumbs.db
+
+.superpowers/
+
+# 原始录音文件夹（同 audio-src，不提交）
+声音/

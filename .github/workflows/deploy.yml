@@ -1,0 +1,69 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      skip_strict:
+        description: "音频不齐也发布（仅预览用）"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run JS tests
+        run: npm test
+
+      - name: Run Python tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Validate assets
+        run: |
+          if [ "${{ inputs.skip_strict }}" = "true" ]; then
+            echo "::warning::跳过严格校验，发布的是音频不全的预览版本"
+            python scripts/check_assets.py
+          else
+            python scripts/check_assets.py --strict
+          fi
+
+      - name: Assemble site
+        run: |
+          mkdir -p dist
+          cp index.html styles.css dist/
+          cp -r js data audio dist/
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - uses: actions/deploy-pages@v4
+        id: deployment
