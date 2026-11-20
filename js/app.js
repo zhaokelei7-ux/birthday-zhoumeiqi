@@ -40,6 +40,8 @@ let player = null;
 let activeName = null;
 let activeView = 'blessing';
 let litThisPlayback = false;
+let finalePending = false;
+let finaleCelebrated = false;
 let lastFocus = null;
 let stopMeteors = null;
 let finaleReturnFocus = null;
@@ -337,6 +339,10 @@ function handleStar(name) {
   saveLit(getStorage(), state.lit);
   render();
 
+  // 最后一颗点亮后先把流星雨挂起：语音播完或卡片被关掉时再放，
+  // 避免提前盖住最后一段祝福，也避免半路关掉卡片后永远看不到。
+  if (newlyLit && isComplete(state) && !finaleCelebrated) finalePending = true;
+
   const audio = manifest[name];
   if (!audio) {
     state = completePlayback(state, name, { missingAudio: true });
@@ -376,9 +382,10 @@ function afterLit(entry, newlyLit = false) {
   saveLit(getStorage(), state.lit);
   render();
 
-  if (newlyLit && isComplete(state)) {
+  if (isComplete(state) && !finaleCelebrated) finalePending = true;
+
+  if (finalePending) {
     closeCard({ stopAudio: false });
-    showFinale();
     return;
   }
 
@@ -423,6 +430,13 @@ function closeCard({ stopAudio = true } = {}) {
     lastFocus.focus({ preventScroll: true });
   }
   lastFocus = null;
+
+  // 半路关掉最后一段语音时，补上流星雨。
+  if (finalePending) {
+    finalePending = false;
+    finaleCelebrated = true;
+    showFinale();
+  }
 }
 
 function showFinale() {
@@ -513,6 +527,8 @@ function resetProgress() {
   clearLit(getStorage());
   state = createState();
   litThisPlayback = false;
+  finalePending = false;
+  finaleCelebrated = false;
   closeCard({ stopAudio: false });
   hideFinale();
   els.finaleReplay.hidden = true;
