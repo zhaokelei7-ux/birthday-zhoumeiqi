@@ -141,6 +141,38 @@ function backgroundStars(count = 120) {
   return nodes;
 }
 
+// 主界面的常驻流星：12 条错开出现，平均每一秒左右就有一颗划过。
+// 用负的 animation-delay 把每条动画拨到「快要划过」的相位，打开页面很快就能看到。
+const METEORS = [
+  { x: 820, y: 140, length: 96, duration: 12, first: 1.2, width: 2.6 },
+  { x: 320, y: 100, length: 82, duration: 15, first: 2.8, width: 1.9 },
+  { x: 690, y: 70, length: 112, duration: 10, first: 4.4, width: 2.2 },
+  { x: 520, y: 130, length: 92, duration: 14, first: 6, width: 2.2 },
+  { x: 900, y: 300, length: 104, duration: 11, first: 7.6, width: 2.4 },
+  { x: 240, y: 300, length: 86, duration: 16, first: 9.2, width: 1.9 },
+  { x: 740, y: 250, length: 96, duration: 13, first: 10.8, width: 2.1 },
+  { x: 430, y: 240, length: 88, duration: 14, first: 12.4, width: 1.8 },
+  { x: 160, y: 170, length: 84, duration: 12, first: 0.4, width: 2.4 },
+  { x: 600, y: 65, length: 100, duration: 15, first: 3.6, width: 1.8 },
+  { x: 860, y: 220, length: 90, duration: 13, first: 6.8, width: 1.9 },
+  { x: 300, y: 200, length: 106, duration: 16, first: 10, width: 2 },
+];
+
+function appendShootingStars() {
+  for (const meteor of METEORS) {
+    // 可见阶段大约从周期的 89% 开始，因此用 first 反推延迟。
+    const delay = (meteor.first - 0.89 * meteor.duration).toFixed(2);
+    els.sky.append(el('line', {
+      x1: meteor.x,
+      y1: meteor.y,
+      x2: meteor.x - meteor.length * 0.86,
+      y2: meteor.y + meteor.length * 0.52,
+      class: 'shooting-star',
+      style: `animation: shooting ${meteor.duration}s linear infinite ${delay}s; stroke-width: ${meteor.width}`,
+    }));
+  }
+}
+
 function buildDefs() {
   const defs = el('defs', {});
 
@@ -209,12 +241,7 @@ function renderSky() {
 
   for (const node of backgroundStars()) els.sky.append(node);
 
-  els.sky.append(el('line', {
-    x1: 820, y1: 140, x2: 750, y2: 186, class: 'shooting-star shoot-one',
-  }));
-  els.sky.append(el('line', {
-    x1: 320, y1: 100, x2: 268, y2: 138, class: 'shooting-star shoot-two',
-  }));
+  appendShootingStars();
 
   for (const team of TEAM_ORDER) {
     const members = layout.filter((entry) => entry.team === team);
